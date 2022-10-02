@@ -1,0 +1,7 @@
+{
+  "name": "Occupational Hazards",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
