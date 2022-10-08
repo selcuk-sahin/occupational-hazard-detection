@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "occupational-hazard-detection": {
+      "hosting": {
+        "app": [
+          "occupational-hazard-detection"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "occupational-hazard-detection"
+  }
+}
