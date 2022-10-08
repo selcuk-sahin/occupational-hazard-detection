@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { NavController } from '@ionic/angular';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -6,5 +8,18 @@ import { Component } from '@angular/core';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  constructor() {}
+  constructor(private authService: AuthService, private navCtrl: NavController) {}
+
+  async logout() {
+    try {
+      await this.authService.logout();
+      this.navCtrl.navigateRoot(['auth']);
+    } catch (error) {
+      alert('log out failed');
+    }
+  }
+
+  refresh(event) {
+    event.target.complete();
+  }
 }

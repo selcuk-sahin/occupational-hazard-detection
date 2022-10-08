@@ -1,7 +1,29 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>auth</ion-title>
+    <ion-title>Auth</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content> </ion-content>
+<ion-content class="ion-padding">
+  <form [formGroup]="credentials" (ngSubmit)="login()">
+    <ion-item class="ion-margin-bottom">
+      <ion-input type="email" placeholder="Email" formControlName="email" autocomplete="email"></ion-input>
+      <ion-note slot="error" *ngIf="(email.dirty && email.touched) && email.errors">Invalid E-mail</ion-note>
+    </ion-item>
+
+    <ion-item class="ion-margin-bottom">
+      <ion-input
+        type="password"
+        placeholder="Password"
+        formControlName="password"
+        autocomplete="current-password"
+      ></ion-input>
+      <ion-note slot="error" *ngIf="(password.dirty && password.touched) && password.errors"
+        >Password needs to be at least 6 characters</ion-note
+      >
+    </ion-item>
+
+    <ion-button expand="full" type="submit" [disabled]="credentials.invalid">Login</ion-button>
+    <ion-button expand="full" type="button" (click)="register()" [disabled]="credentials.invalid">Register</ion-button>
+  </form>
+</ion-content>
