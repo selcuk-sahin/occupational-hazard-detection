@@ -7,5 +7,5 @@ export const environment = {
     authDomain: 'occupational-hazard-detection.firebaseapp.com',
     messagingSenderId: '917633198578',
   },
-  production: true
+  production: true,
 };
