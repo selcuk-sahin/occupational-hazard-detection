@@ -11,7 +11,9 @@ import { environment } from '../environments/environment';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFunctions, getFunctions } from '@angular/fire/functions';
 import { provideStorage, getStorage } from '@angular/fire/storage';
-import { DragAndDropDirective, DragAndDropDirectiveModule } from './directives/drag-and-drop.directive';
+import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { DragAndDropDirectiveModule } from './directives/drag-and-drop.directive';
+import { FormatBytesPipeModule } from './pipes/format-bytes.pipe';
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,10 +25,12 @@ import { DragAndDropDirective, DragAndDropDirectiveModule } from './directives/d
     provideAuth(() => getAuth()),
     provideFunctions(() => getFunctions()),
     provideStorage(() => getStorage()),
+    provideFirestore(() => getFirestore()),
     DragAndDropDirectiveModule,
+    FormatBytesPipeModule,
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
-  exports: [DragAndDropDirective],
+  exports: [DragAndDropDirectiveModule, FormatBytesPipeModule],
 })
 export class AppModule {}
