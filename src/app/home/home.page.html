@@ -14,21 +14,48 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-list>
-    <ion-list-header>My Reports</ion-list-header>
-    <ion-item>
-      <ion-card>
-        <ion-card-content>
-          <img src="https://via.placeholder.com/150" />
-        </ion-card-content>
-      </ion-card>
-    </ion-item>
-    <ion-item>
-      <ion-card>
-        <ion-card-content>
-          <img src="https://via.placeholder.com/150" />
-        </ion-card-content>
-      </ion-card>
-    </ion-item>
-  </ion-list>
+  <ion-segment (ionChange)="onSegmentChanged($event)" value="drafts">
+    <ion-segment-button value="drafts">
+      <ion-label>Drafts</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="reports">
+      <ion-label>Reports</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <ng-container *ngIf="segment === 'drafts'">
+    <ion-list>
+      <ion-list-header>Drafts</ion-list-header>
+      <ion-item>
+        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>My Example Place</h3>
+          <p class="status">
+            <ion-text color="success"><ion-text color="medium">Status: </ion-text><span>Sent</span></ion-text>
+            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          </p>
+          <p>Created At: {{today | date}}</p>
+          <p>Updated At: {{today | date}}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
+
+  <ng-container *ngIf="segment === 'reports'">
+    <ion-list>
+      <ion-list-header>Reports</ion-list-header>
+      <ion-item href="123">
+        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h3>My Example Place</h3>
+          <p class="status">
+            <ion-text color="success"><ion-text color="medium">Status: </ion-text><span>Sent</span></ion-text>
+            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+          </p>
+          <p>Created At: {{today | date}}</p>
+          <p>Updated At: {{today | date}}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-container>
 </ion-content>

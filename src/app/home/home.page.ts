@@ -4,13 +4,18 @@ import { AlertService } from '../services/alert.service';
 import { AuthService } from '../services/auth.service';
 import { Report, ReportService } from '../services/report.service';
 
+type PageSegment = 'drafts' | 'reports';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
+  today = new Date();
   reports: Report[] = [];
+  segment: PageSegment = 'drafts';
+
   constructor(
     private authService: AuthService,
     private navCtrl: NavController,
@@ -38,5 +43,9 @@ export class HomePage {
     } catch (error) {
       this.alertService.showAlert({ header: 'Error', message: 'Failed to fetch reports.' });
     }
+  }
+
+  onSegmentChanged(segment: Event) {
+    this.segment = (segment as any).detail.value as PageSegment;
   }
 }
