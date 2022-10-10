@@ -3,9 +3,20 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
+import { FileUploadService } from 'src/app/services/file-upload.service';
 import { Report, ReportService } from 'src/app/services/report.service';
 import { SubSink } from 'subsink';
 type PageMode = 'create' | 'update';
+
+interface FileMetadata {
+  [key: string]: {
+    file: File;
+    name: string;
+    size: number;
+    progress: number;
+    state: 'failed' | 'uploading' | 'success';
+  };
+}
 
 @Component({
   selector: 'app-report',
@@ -15,7 +26,7 @@ type PageMode = 'create' | 'update';
 export class ReportPage implements OnInit, OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
   form: FormGroup;
-  files: any[] = [];
+  files: FileMetadata = {};
   pageMode: PageMode = 'update';
   reportId = '';
   report: Report;
@@ -27,6 +38,7 @@ export class ReportPage implements OnInit, OnDestroy {
     private reportService: ReportService,
     private loadingCtrl: LoadingController,
     private alertService: AlertService,
+    private fileUploadService: FileUploadService,
     private fb: FormBuilder,
   ) {
     const navigation = this.router.getCurrentNavigation();
@@ -114,34 +126,30 @@ export class ReportPage implements OnInit, OnDestroy {
   /**
    * Delete file from files list
    *
-   * @param index (File index)
+   * @param key (File key)
    */
-  deleteFile(index: number) {
-    if (this.files[index].progress < 100) {
+  deleteFile(key: string) {
+    if (this.files[key].progress < 100) {
       console.log('Upload in progress.');
       return;
     }
-    this.files.splice(index, 1);
+    delete this.files[key];
   }
 
   /**
    * Simulate the upload process
    */
-  uploadFilesSimulator(index: number) {
-    setTimeout(() => {
-      if (index === this.files.length) {
-        return;
-      } else {
-        const progressInterval = setInterval(() => {
-          if (this.files[index].progress === 100) {
-            clearInterval(progressInterval);
-            this.uploadFilesSimulator(index + 1);
-          } else {
-            this.files[index].progress += 5;
-          }
-        }, 200);
-      }
-    }, 1000);
+  async uploadFile(key: string) {
+    const fileMetadata = this.files[key];
+    try {
+      const result = await this.fileUploadService.uploadUnderReport(this.reportId, fileMetadata.file);
+      await this.reportService.linkMedia(this.reportId, result.ref.fullPath);
+      this.files[key].state = 'success';
+    } catch (error) {
+      this.files[key].state = 'failed';
+    } finally {
+      this.files[key].progress = 100;
+    }
   }
 
   /**
@@ -149,12 +157,17 @@ export class ReportPage implements OnInit, OnDestroy {
    *
    * @param files (Files List)
    */
-  prepareFilesList(files: Array<any>) {
-    for (const item of files) {
-      item.progress = 0;
-      this.files.push(item);
+  prepareFilesList(files: File[]) {
+    for (const file of files) {
+      this.files[file.name] = {
+        file,
+        name: file.name,
+        progress: 0,
+        size: file.size,
+        state: 'uploading',
+      };
+      this.uploadFile(file.name);
     }
     this.fileDropEl.nativeElement.value = '';
-    this.uploadFilesSimulator(0);
   }
 }

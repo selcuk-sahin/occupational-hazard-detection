@@ -27,7 +27,7 @@
       <label for="fileDropRef">Browse for files</label>
     </div>
     <ion-list class="ion-margin-top">
-      <ion-item *ngFor="let file of files; let index = index" class="single-file">
+      <ion-item *ngFor="let file of files | keyvalue; let index = index" class="single-file">
         <ion-thumbnail slot="start">
           <!-- todo replace with actual image -->
           <img
@@ -38,11 +38,32 @@
           />
         </ion-thumbnail>
         <ion-label class="info" slot="">
-          <h4 class="name">{{ file?.name }}</h4>
-          <p class="size">{{file?.size | formatBytes }}</p>
-          <ion-progress-bar [buffer]="file?.progress"></ion-progress-bar>
+          <h4 class="name">{{ file.value.name }}</h4>
+          <p class="size">{{file.value.size | formatBytes }}</p>
+          <ion-progress-bar [buffer]="file.value?.progress"></ion-progress-bar>
         </ion-label>
-        <ion-icon name="trash-outline" slot="end" (click)="deleteFile(index)" alt="file" color="danger"></ion-icon>
+        <ion-button slot="end" color="primary">
+          <ion-icon
+            *ngIf="file.value.state === 'success' "
+            name="trash-outline"
+            slot="icon-only"
+            (click)="deleteFile(file.key)"
+            alt="remove"
+          ></ion-icon>
+          <ion-icon
+            *ngIf="file.value.state === 'uploading' "
+            name="hourglass-outline"
+            slot="icon-only"
+            alt="uploading"
+          ></ion-icon>
+          <ion-icon
+            *ngIf="file.value.state === 'failed' "
+            name="hourglass-outline"
+            slot="icon-only"
+            (click)="uploadFile(file.key)"
+            alt="retry"
+          ></ion-icon>
+        </ion-button>
       </ion-item>
     </ion-list>
 

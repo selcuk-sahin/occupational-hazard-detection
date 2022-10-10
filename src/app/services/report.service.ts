@@ -1,5 +1,14 @@
 import { Injectable } from '@angular/core';
-import { collection, doc, Firestore, getDocFromServer, getDocs, setDoc, Timestamp } from '@angular/fire/firestore';
+import {
+  arrayUnion,
+  collection,
+  doc,
+  Firestore,
+  getDocFromServer,
+  getDocs,
+  setDoc,
+  Timestamp,
+} from '@angular/fire/firestore';
 import { updateDoc } from '@firebase/firestore';
 import { AuthService } from './auth.service';
 
@@ -64,6 +73,19 @@ export class ReportService {
     };
     await updateDoc(docRef, partialReport);
     return report;
+  }
+
+  async linkMedia(reportId: string, fileUrl: string) {
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('log-in required');
+      return;
+    }
+    const docRef = doc(this.fireStore, `users/${user.uid}/drafts/${reportId}`);
+    // Atomically add a new fileUrl to the "inputFiles" array field.
+    await updateDoc(docRef, {
+      inputFiles: arrayUnion(fileUrl),
+    });
   }
 
   async getReports(type: 'drafts' | 'reports'): Promise<Report[]> {
