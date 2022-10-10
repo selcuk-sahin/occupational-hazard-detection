@@ -14,6 +14,7 @@ import { provideStorage, getStorage } from '@angular/fire/storage';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { DragAndDropDirectiveModule } from './directives/drag-and-drop.directive';
 import { FormatBytesPipeModule } from './pipes/format-bytes.pipe';
+import { FirestoreTimestampPipeModule } from './pipes/firestore-timestamp.pipe';
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,9 +29,10 @@ import { FormatBytesPipeModule } from './pipes/format-bytes.pipe';
     provideFirestore(() => getFirestore()),
     DragAndDropDirectiveModule,
     FormatBytesPipeModule,
+    FirestoreTimestampPipeModule,
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
-  exports: [DragAndDropDirectiveModule, FormatBytesPipeModule],
+  exports: [DragAndDropDirectiveModule, FormatBytesPipeModule, FirestoreTimestampPipeModule],
 })
 export class AppModule {}

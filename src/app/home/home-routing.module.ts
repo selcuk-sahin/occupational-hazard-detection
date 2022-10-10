@@ -12,10 +12,6 @@ const routes: Routes = [
     path: 'report/:id',
     loadChildren: () => import('./report/report.module').then((m) => m.ReportPageModule),
   },
-  {
-    path: 'report',
-    loadChildren: () => import('./report/report.module').then((m) => m.ReportPageModule),
-  },
 ];
 
 @NgModule({

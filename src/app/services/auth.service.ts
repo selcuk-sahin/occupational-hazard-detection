@@ -12,6 +12,10 @@ interface Credentials {
 export class AuthService {
   constructor(private auth: Auth) {}
 
+  currentUser() {
+    return this.auth.currentUser;
+  }
+
   register(credentials: Credentials) {
     return createUserWithEmailAndPassword(this.auth, credentials.email, credentials.password);
   }

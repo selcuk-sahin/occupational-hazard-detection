@@ -5,9 +5,10 @@ import { FormsModule } from '@angular/forms';
 
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
+import { FirestoreTimestampPipeModule } from '../pipes/firestore-timestamp.pipe';
 
 @NgModule({
-  imports: [CommonModule, FormsModule, IonicModule, HomePageRoutingModule],
+  imports: [CommonModule, FormsModule, IonicModule, HomePageRoutingModule, FirestoreTimestampPipeModule],
   declarations: [HomePage],
 })
 export class HomePageModule {}

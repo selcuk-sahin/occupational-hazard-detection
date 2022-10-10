@@ -1,6 +1,9 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Report</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{pageMode | titlecase }} Report</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -24,7 +27,7 @@
       </ion-thumbnail>
       <ion-label class="info" slot="">
         <h4 class="name">{{ file?.name }}</h4>
-        <p class="size">{{ formatBytes(file?.size) }}</p>
+        <p class="size">{{file?.size | formatBytes }}</p>
         <ion-progress-bar [buffer]="file?.progress"></ion-progress-bar>
       </ion-label>
       <ion-icon name="trash-outline" slot="end" (click)="deleteFile(index)" alt="file" color="danger"></ion-icon>

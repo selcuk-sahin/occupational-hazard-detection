@@ -1,17 +1,57 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
+import { ReportService } from 'src/app/services/report.service';
+import { SubSink } from 'subsink';
+type PageMode = 'create' | 'update';
 
 @Component({
   selector: 'app-report',
   templateUrl: './report.page.html',
   styleUrls: ['./report.page.scss'],
 })
-export class ReportPage implements OnInit {
+export class ReportPage implements OnInit, OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
   files: any[] = [];
+  pageMode: PageMode = 'update';
+  reportId = '';
+  subs = new SubSink();
 
-  constructor() {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private reportService: ReportService,
+    private loadingCtrl: LoadingController,
+  ) {
+    const navigation = this.router.getCurrentNavigation();
+    if (navigation) {
+      const state = navigation.extras.state;
+      console.log('state', state);
+      this.pageMode = state && state?.create ? 'create' : 'update';
+    }
+    this.subs.sink = this.route.params.subscribe((params) => {
+      this.reportId = params['id'] ?? '';
+      if (this.reportId) {
+        this.getReportDetail(this.reportId);
+      } else {
+        this.createReport();
+      }
+    });
+  }
 
   ngOnInit() {}
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
+  }
+
+  async createReport() {
+    this.reportService.create();
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+  }
+
+  getReportDetail(id: string) {}
 
   /**
    * on file drop handler
