@@ -8,29 +8,45 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">
-    <input type="file" #fileDropRef id="fileDropRef" multiple (change)="fileBrowseHandler($any($event.target).files)" />
-    <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
-    <span class="text">Drag and drop <br />or</span>
-    <label for="fileDropRef">Browse for files</label>
-  </div>
-  <ion-list class="ion-margin-top">
-    <ion-item *ngFor="let file of files; let index = index" class="single-file">
-      <ion-thumbnail slot="start">
-        <!-- todo replace with actual image -->
-        <img
-          alt="Silhouette of mountains"
-          src="https://ionicframework.com/docs/img/demos/thumbnail.svg"
-          width="45px"
-          alt="file"
-        />
-      </ion-thumbnail>
-      <ion-label class="info" slot="">
-        <h4 class="name">{{ file?.name }}</h4>
-        <p class="size">{{file?.size | formatBytes }}</p>
-        <ion-progress-bar [buffer]="file?.progress"></ion-progress-bar>
-      </ion-label>
-      <ion-icon name="trash-outline" slot="end" (click)="deleteFile(index)" alt="file" color="danger"></ion-icon>
+  <form [formGroup]="form" (ngSubmit)="onSave()">
+    <ion-item class="ion-margin-vertical">
+      <ion-label position="floating">Location</ion-label>
+      <ion-input type="text" placeholder="Location" autocomplete="off" formControlName="location"></ion-input>
     </ion-item>
-  </ion-list>
+
+    <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">
+      <input
+        type="file"
+        #fileDropRef
+        id="fileDropRef"
+        multiple
+        (change)="fileBrowseHandler($any($event.target).files)"
+      />
+      <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
+      <span class="text">Drag and drop <br />or</span>
+      <label for="fileDropRef">Browse for files</label>
+    </div>
+    <ion-list class="ion-margin-top">
+      <ion-item *ngFor="let file of files; let index = index" class="single-file">
+        <ion-thumbnail slot="start">
+          <!-- todo replace with actual image -->
+          <img
+            alt="Silhouette of mountains"
+            src="https://ionicframework.com/docs/img/demos/thumbnail.svg"
+            width="45px"
+            alt="file"
+          />
+        </ion-thumbnail>
+        <ion-label class="info" slot="">
+          <h4 class="name">{{ file?.name }}</h4>
+          <p class="size">{{file?.size | formatBytes }}</p>
+          <ion-progress-bar [buffer]="file?.progress"></ion-progress-bar>
+        </ion-label>
+        <ion-icon name="trash-outline" slot="end" (click)="deleteFile(index)" alt="file" color="danger"></ion-icon>
+      </ion-item>
+    </ion-list>
+
+    <ion-button class="ion-margin-vertical" expand="block" type="submit" color="primary"> Save </ion-button>
+    <ion-button expand="block" type="button" color="medium" (click)="onDelete()"> Delete </ion-button>
+  </form>
 </ion-content>

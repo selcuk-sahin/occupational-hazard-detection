@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { addDoc, collection, doc, Firestore, getDocs, QuerySnapshot, Timestamp } from '@angular/fire/firestore';
+import { collection, doc, Firestore, getDocFromServer, getDocs, setDoc, Timestamp } from '@angular/fire/firestore';
+import { updateDoc } from '@firebase/firestore';
 import { AuthService } from './auth.service';
 
 export class Report {
@@ -29,7 +30,7 @@ export class Report {
 export class ReportService {
   constructor(private authService: AuthService, private fireStore: Firestore) {}
 
-  create() {
+  async create() {
     const user = this.authService.currentUser();
     if (!user) {
       alert('log-in required');
@@ -45,24 +46,47 @@ export class ReportService {
         }),
       ),
     );
-    console.log(report);
-    return addDoc(collectionRef, report);
+    await setDoc(docRef, report);
+    return report;
   }
 
-  async getReports(): Promise<Report[]> {
+  async update(report: Partial<Report>) {
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('log-in required');
+      return;
+    }
+    const docRef = doc(this.fireStore, `users/${user.uid}/drafts/${report.id}`);
+    const partialReport: Partial<Report> = {
+      updatedAt: Timestamp.now(),
+      location: report.location,
+      status: report.status,
+    };
+    await updateDoc(docRef, partialReport);
+    return report;
+  }
+
+  async getReports(type: 'drafts' | 'reports'): Promise<Report[]> {
     const user = this.authService.currentUser();
     if (!user) {
       alert('log-in required');
       return;
     }
 
-    const collectionRef = collection(this.fireStore, `users/${user.uid}/drafts`);
+    const collectionRef = collection(this.fireStore, `users/${user.uid}/${type}`);
     const snapShot = await getDocs(collectionRef);
-    return snapShot.docs.map((snapshot) => {
-      return snapshot.data() as Report;
-      // data.createdAt = Timestamp.fromMillis(data?.createdAt?.seconds * 1000 || 0);
-      // data.updatedAt = Timestamp.fromMillis(data?.updatedAt?.seconds * 1000 || 0);
-      // return data as Report;
-    });
+    return snapShot.docs.map((snapshot) => snapshot.data() as Report);
+  }
+
+  async getById(type: 'drafts' | 'reports', reportId: string): Promise<Report> {
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('log-in required');
+      return;
+    }
+
+    const docRef = doc(this.fireStore, `users/${user.uid}/${type}/${reportId}`);
+    const snapshot = await getDocFromServer(docRef);
+    return snapshot.data() as Report;
   }
 }

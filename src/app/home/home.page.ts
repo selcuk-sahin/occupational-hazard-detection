@@ -34,9 +34,12 @@ export class HomePage implements OnInit {
     const loading = await this.loadingCtrl.create();
     loading.present();
     try {
-      const docRef = await this.reportService.create();
+      const report = await this.reportService.create();
       await loading.dismiss();
-      await this.navCtrl.navigateForward(['report/', docRef.id], { state: { create: true }, relativeTo: this.route });
+      await this.navCtrl.navigateForward(['report/', report.id], {
+        state: { report, create: true },
+        relativeTo: this.route,
+      });
     } catch (error) {
       this.alertService.showAlert({ header: 'Failed to create', message: error?.message });
     } finally {
@@ -60,9 +63,11 @@ export class HomePage implements OnInit {
 
   async getReports() {
     try {
-      this.drafts = await this.reportService.getReports();
+      [this.drafts, this.reports] = await Promise.all([
+        this.reportService.getReports('drafts'),
+        this.reportService.getReports('reports'),
+      ]);
     } catch (error) {
-      console.log(error);
       this.alertService.showAlert({ header: 'Error', message: 'Failed to fetch reports.' });
     }
   }

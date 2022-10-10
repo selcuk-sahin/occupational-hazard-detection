@@ -37,6 +37,7 @@
         *ngFor="let draft of drafts"
         [routerLink]="['report', draft.id]"
         routerDirection="forward"
+        [state]="{report: draft}"
         [detail]="true"
       >
         <ion-icon name="list-circle-outline" slot="start"></ion-icon>
@@ -62,6 +63,7 @@
         *ngFor="let report of reports"
         [routerLink]="['report', report.id]"
         routerDirection="forward"
+        [state]="{report}"
         [detail]="true"
       >
         <ion-icon name="list-circle-outline" slot="start"></ion-icon>

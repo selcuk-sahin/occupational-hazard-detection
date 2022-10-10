@@ -1,7 +1,9 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
-import { ReportService } from 'src/app/services/report.service';
+import { AlertService } from 'src/app/services/alert.service';
+import { Report, ReportService } from 'src/app/services/report.service';
 import { SubSink } from 'subsink';
 type PageMode = 'create' | 'update';
 
@@ -12,9 +14,11 @@ type PageMode = 'create' | 'update';
 })
 export class ReportPage implements OnInit, OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
+  form: FormGroup;
   files: any[] = [];
   pageMode: PageMode = 'update';
   reportId = '';
+  report: Report;
   subs = new SubSink();
 
   constructor(
@@ -22,19 +26,22 @@ export class ReportPage implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private reportService: ReportService,
     private loadingCtrl: LoadingController,
+    private alertService: AlertService,
+    private fb: FormBuilder,
   ) {
     const navigation = this.router.getCurrentNavigation();
-    if (navigation) {
-      const state = navigation.extras.state;
-      console.log('state', state);
-      this.pageMode = state && state?.create ? 'create' : 'update';
-    }
+    const state = navigation.extras.state;
+    this.pageMode = state && state?.create ? 'create' : 'update';
+    this.initForm(state?.report);
+
     this.subs.sink = this.route.params.subscribe((params) => {
-      this.reportId = params['id'] ?? '';
+      this.reportId = params?.id ?? '';
       if (this.reportId) {
-        this.getReportDetail(this.reportId);
+        if (!state?.report) {
+          this.getReportDetail(this.reportId);
+        }
       } else {
-        this.createReport();
+        this.alertService.showAlert({ message: 'Report not found' });
       }
     });
   }
@@ -45,13 +52,50 @@ export class ReportPage implements OnInit, OnDestroy {
     this.subs.unsubscribe();
   }
 
+  initForm(report?: Report) {
+    this.form = this.fb.group({
+      location: [report?.location, []],
+    });
+  }
+
   async createReport() {
     this.reportService.create();
     const loading = await this.loadingCtrl.create();
     loading.present();
   }
 
-  getReportDetail(id: string) {}
+  async getReportDetail(id: string) {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    try {
+      this.report = await this.reportService.getById('drafts', id);
+      this.initForm(this.report);
+    } catch (error) {
+      this.alertService.showAlert({ header: 'Failed to fetch details', message: error?.message });
+    } finally {
+      loading.dismiss();
+    }
+  }
+
+  async onSave() {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    try {
+      await this.reportService.update({
+        id: this.report.id,
+        location: this.form.controls.location.value,
+        status: this.report.status,
+      });
+    } catch (error) {
+      this.alertService.showAlert({ header: 'Failed to save', message: error?.message });
+    } finally {
+      loading.dismiss();
+    }
+  }
+
+  async onDelete() {
+    this.alertService.showAlert({ header: 'Not implemented', message: 'TBD' });
+  }
 
   /**
    * on file drop handler
@@ -69,6 +113,7 @@ export class ReportPage implements OnInit, OnDestroy {
 
   /**
    * Delete file from files list
+   *
    * @param index (File index)
    */
   deleteFile(index: number) {
@@ -101,6 +146,7 @@ export class ReportPage implements OnInit, OnDestroy {
 
   /**
    * Convert Files list to normal array list
+   *
    * @param files (Files List)
    */
   prepareFilesList(files: Array<any>) {
