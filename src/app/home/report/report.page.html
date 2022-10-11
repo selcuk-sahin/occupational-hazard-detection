@@ -27,42 +27,28 @@
       <label for="fileDropRef">Browse for files</label>
     </div>
     <ion-list class="ion-margin-top">
-      <ion-item *ngFor="let file of files | keyvalue; let index = index" class="single-file">
+      <ion-item *ngFor="let file of files | keyvalue;" class="single-file">
         <ion-thumbnail slot="start">
-          <!-- todo replace with actual image -->
           <img
-            alt="Silhouette of mountains"
-            src="https://ionicframework.com/docs/img/demos/thumbnail.svg"
-            width="45px"
-            alt="file"
+            *ngIf="file.value?.file?.type.indexOf('image')> -1"
+            alt="uploaded media"
+            [src]="file.value?.prewiew ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'"
           />
+          <video *ngIf="file.value?.file?.type.indexOf('video')> -1" [src]="file.value?.prewiew"></video>
         </ion-thumbnail>
         <ion-label class="info" slot="">
           <h4 class="name">{{ file.value.name }}</h4>
           <p class="size">{{file.value.size | formatBytes }}</p>
           <ion-progress-bar [buffer]="file.value?.progress"></ion-progress-bar>
         </ion-label>
-        <ion-button slot="end" color="primary">
-          <ion-icon
-            *ngIf="file.value.state === 'success' "
-            name="trash-outline"
-            slot="icon-only"
-            (click)="deleteFile(file.key)"
-            alt="remove"
-          ></ion-icon>
-          <ion-icon
-            *ngIf="file.value.state === 'uploading' "
-            name="hourglass-outline"
-            slot="icon-only"
-            alt="uploading"
-          ></ion-icon>
-          <ion-icon
-            *ngIf="file.value.state === 'failed' "
-            name="hourglass-outline"
-            slot="icon-only"
-            (click)="uploadFile(file.key)"
-            alt="retry"
-          ></ion-icon>
+        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'success' " (click)="deleteFile(file.key)">
+          <ion-icon name="trash-outline" slot="icon-only" alt="remove"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'uploading' ">
+          <ion-icon name="hourglass-outline" slot="icon-only" alt="uploading"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'failed' " (click)="uploadFile(file.key)">
+          <ion-icon name="hourglass-outline" slot="icon-only" alt="retry"></ion-icon>
         </ion-button>
       </ion-item>
     </ion-list>

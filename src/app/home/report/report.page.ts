@@ -1,5 +1,6 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
@@ -9,13 +10,12 @@ import { SubSink } from 'subsink';
 type PageMode = 'create' | 'update';
 
 interface FileMetadata {
-  [key: string]: {
-    file: File;
-    name: string;
-    size: number;
-    progress: number;
-    state: 'failed' | 'uploading' | 'success';
-  };
+  file?: File | Blob;
+  name: string;
+  size: number;
+  progress: number;
+  state: 'failed' | 'uploading' | 'success';
+  prewiew?: SafeUrl;
 }
 
 @Component({
@@ -23,10 +23,10 @@ interface FileMetadata {
   templateUrl: './report.page.html',
   styleUrls: ['./report.page.scss'],
 })
-export class ReportPage implements OnInit, OnDestroy {
+export class ReportPage implements OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
   form: FormGroup;
-  files: FileMetadata = {};
+  files = new Map<string, FileMetadata>();
   pageMode: PageMode = 'update';
   reportId = '';
   report: Report;
@@ -40,6 +40,7 @@ export class ReportPage implements OnInit, OnDestroy {
     private alertService: AlertService,
     private fileUploadService: FileUploadService,
     private fb: FormBuilder,
+    private sanitizer: DomSanitizer,
   ) {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation.extras.state;
@@ -49,6 +50,7 @@ export class ReportPage implements OnInit, OnDestroy {
     this.subs.sink = this.route.params.subscribe((params) => {
       this.reportId = params?.id ?? '';
       if (this.reportId) {
+        this.getFiles();
         if (!state?.report) {
           this.getReportDetail(this.reportId);
         }
@@ -58,22 +60,37 @@ export class ReportPage implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {}
-
   ngOnDestroy(): void {
     this.subs.unsubscribe();
+  }
+
+  async getFiles() {
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    try {
+      const blobMap = await this.fileUploadService.listAllFilesUnderReport(this.reportId);
+      blobMap.forEach((blob, fileName) => {
+        const objectURL = URL.createObjectURL(blob);
+        this.files.set(fileName, {
+          file: blob,
+          name: fileName,
+          progress: 100,
+          size: blob.size,
+          state: 'success',
+          prewiew: this.sanitizer.bypassSecurityTrustUrl(objectURL),
+        });
+      });
+    } catch (error) {
+      this.alertService.showAlert({ header: 'Error', message: JSON.stringify(error) });
+    } finally {
+      loading.dismiss();
+    }
   }
 
   initForm(report?: Report) {
     this.form = this.fb.group({
       location: [report?.location, []],
     });
-  }
-
-  async createReport() {
-    this.reportService.create();
-    const loading = await this.loadingCtrl.create();
-    loading.present();
   }
 
   async getReportDetail(id: string) {
@@ -113,14 +130,14 @@ export class ReportPage implements OnInit, OnDestroy {
    * on file drop handler
    */
   onFileDropped(event) {
-    this.prepareFilesList(event);
+    this.uploadFiles(event);
   }
 
   /**
    * handle file from browsing
    */
   fileBrowseHandler(files) {
-    this.prepareFilesList(files);
+    this.uploadFiles(files);
   }
 
   /**
@@ -128,27 +145,40 @@ export class ReportPage implements OnInit, OnDestroy {
    *
    * @param key (File key)
    */
-  deleteFile(key: string) {
-    if (this.files[key].progress < 100) {
+  async deleteFile(key: string) {
+    const metadata = this.files.get(key);
+    if (metadata.progress < 100) {
       console.log('Upload in progress.');
       return;
     }
-    delete this.files[key];
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    try {
+      await this.fileUploadService.deleteFileUnderReport(this.reportId, metadata.name);
+      this.files.delete(key);
+    } catch (error) {
+      this.alertService.showAlert({ header: 'Failed to delete', message: error?.message });
+    } finally {
+      loading.dismiss();
+    }
   }
 
   /**
    * Simulate the upload process
    */
   async uploadFile(key: string) {
-    const fileMetadata = this.files[key];
+    const fileMetadata = this.files.get(key);
     try {
-      const result = await this.fileUploadService.uploadUnderReport(this.reportId, fileMetadata.file);
+      const result = await this.fileUploadService.uploadUnderReport(this.reportId, fileMetadata.file as File);
       await this.reportService.linkMedia(this.reportId, result.ref.fullPath);
-      this.files[key].state = 'success';
+      fileMetadata.state = 'success';
+      const objectURL = URL.createObjectURL(fileMetadata.file);
+      fileMetadata.prewiew = this.sanitizer.bypassSecurityTrustUrl(objectURL);
     } catch (error) {
-      this.files[key].state = 'failed';
+      fileMetadata.state = 'failed';
     } finally {
-      this.files[key].progress = 100;
+      fileMetadata.progress = 100;
+      this.files.set(key, fileMetadata);
     }
   }
 
@@ -157,15 +187,15 @@ export class ReportPage implements OnInit, OnDestroy {
    *
    * @param files (Files List)
    */
-  prepareFilesList(files: File[]) {
+  uploadFiles(files: File[]) {
     for (const file of files) {
-      this.files[file.name] = {
+      this.files.set(file.name, {
         file,
         name: file.name,
         progress: 0,
         size: file.size,
         state: 'uploading',
-      };
+      });
       this.uploadFile(file.name);
     }
     this.fileDropEl.nativeElement.value = '';
