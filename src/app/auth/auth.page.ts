@@ -19,19 +19,19 @@ export class AuthPage implements OnInit {
     private alertService: AlertService,
   ) {}
 
-  ngOnInit() {
-    this.credentials = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-    });
-  }
-
   get email() {
     return this.credentials.get('email');
   }
 
   get password() {
     return this.credentials.get('password');
+  }
+
+  ngOnInit() {
+    this.credentials = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
   }
 
   async login() {

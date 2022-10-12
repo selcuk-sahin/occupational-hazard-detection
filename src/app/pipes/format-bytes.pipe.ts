@@ -6,6 +6,7 @@ import { NgModule, Pipe, PipeTransform } from '@angular/core';
 export class FormatBytesPipe implements PipeTransform {
   /**
    * format bytes
+   *
    * @param bytes (File size in bytes)
    * @param decimals (Decimals point)
    */
