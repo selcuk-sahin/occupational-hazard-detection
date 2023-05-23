@@ -2,7 +2,7 @@ import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AlertService } from 'src/app/services/alert.service';
 import { FileUploadService } from 'src/app/services/file-upload.service';
 import { Report, ReportService } from 'src/app/services/report.service';
@@ -41,6 +41,7 @@ export class ReportPage implements OnDestroy {
     private fileUploadService: FileUploadService,
     private fb: FormBuilder,
     private sanitizer: DomSanitizer,
+    private navCtrl: NavController,
   ) {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation.extras.state;
@@ -116,6 +117,7 @@ export class ReportPage implements OnDestroy {
         location: this.form.controls.location.value,
         status: this.report.status,
       });
+      this.alertService.showAlert({ header: 'Success', message: 'Your media will be analyzed soon.' });
     } catch (error) {
       this.alertService.showAlert({ header: 'Failed to save', message: error?.message });
     } finally {
@@ -124,7 +126,17 @@ export class ReportPage implements OnDestroy {
   }
 
   async onDelete() {
-    this.alertService.showAlert({ header: 'Not implemented', message: 'TBD' });
+    const loading = await this.loadingCtrl.create();
+    loading.present();
+    try {
+      await this.reportService.delete(this.report.id);
+      this.report = undefined;
+      this.navCtrl.navigateBack(['/home']);
+    } catch (error) {
+      this.alertService.showAlert({ header: 'Failed to delete', message: error?.message });
+    } finally {
+      loading.dismiss();
+    }
   }
 
   /**

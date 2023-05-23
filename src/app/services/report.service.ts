@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import {
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   Firestore,
   getDocFromServer,
@@ -37,6 +38,10 @@ export class Report {
   providedIn: 'root',
 })
 export class ReportService {
+  created = new EventEmitter<Report>();
+  updated = new EventEmitter<Partial<Report>>();
+  deleted = new EventEmitter<Report['id']>();
+
   constructor(private authService: AuthService, private fireStore: Firestore) {}
 
   async create() {
@@ -56,6 +61,7 @@ export class ReportService {
       ),
     );
     await setDoc(docRef, report);
+    this.created.next(report);
     return report;
   }
 
@@ -72,7 +78,20 @@ export class ReportService {
       status: report.status,
     };
     await updateDoc(docRef, partialReport);
+    this.updated.next({ ...report, ...partialReport });
     return report;
+  }
+
+  async delete(id: Report['id']) {
+    const user = this.authService.currentUser();
+    if (!user) {
+      alert('log-in required');
+      return;
+    }
+    // Deletes the document, but the media related to the document still exists
+    const docRef = doc(this.fireStore, `users/${user.uid}/drafts/${id}`);
+    await deleteDoc(docRef);
+    this.deleted.next(id);
   }
 
   async linkMedia(reportId: string, fileUrl: string) {
