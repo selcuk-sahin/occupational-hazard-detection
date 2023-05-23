@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LoadingController, NavController } from '@ionic/angular';
 import { AlertService } from '../services/alert.service';
 import { AuthService } from '../services/auth.service';
 import { Report, ReportService } from '../services/report.service';
+import { SubSink } from 'subsink';
 
 type PageSegment = 'drafts' | 'reports';
 
@@ -12,10 +13,11 @@ type PageSegment = 'drafts' | 'reports';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage implements OnInit, OnDestroy {
   drafts: Report[] = [];
   reports: Report[] = [];
   segment: PageSegment = 'drafts';
+  subs = new SubSink();
 
   constructor(
     private authService: AuthService,
@@ -28,6 +30,32 @@ export class HomePage implements OnInit {
 
   ngOnInit(): void {
     this.getReports();
+
+    // Update the UI without making an additional request on CRUD operations
+    this.subs.sink = this.reportService.created.subscribe((report) => {
+      if (report.status === 'draft') {
+        this.drafts.push(report);
+      }
+    });
+    this.subs.sink = this.reportService.updated.subscribe((report) => {
+      if (report.status === 'draft') {
+        const index = this.drafts.findIndex((r) => r.id === report.id);
+        if (index !== -1) {
+          const existingReport = this.drafts[index];
+          this.drafts[index] = { ...existingReport, ...report };
+        }
+      }
+    });
+    this.subs.sink = this.reportService.deleted.subscribe((reportId) => {
+      const index = this.drafts.findIndex((r) => r.id === reportId);
+      if (index !== -1) {
+        this.drafts.splice(index, 1);
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.subs.unsubscribe();
   }
 
   async createNewDraft() {
