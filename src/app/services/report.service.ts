@@ -23,7 +23,7 @@ export class Report {
   updatedAt: Timestamp;
   constructor(params?: Partial<Report>) {
     this.id = params?.id ?? '';
-    this.location = params?.location ?? 'Unknown';
+    this.location = params?.location ?? '';
     this.status = params?.status ?? 'draft';
     this.inputFiles = params?.inputFiles !== undefined ? [...params.inputFiles] : [];
     this.outputFiles = params?.outputFiles !== undefined ? [...params.outputFiles] : [];

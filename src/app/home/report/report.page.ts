@@ -45,7 +45,8 @@ export class ReportPage implements OnDestroy {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation.extras.state;
     this.pageMode = state && state?.create ? 'create' : 'update';
-    this.initForm(state?.report);
+    this.initForm(state?.report as Report);
+    if (state?.report) this.report = state?.report as Report;
 
     this.subs.sink = this.route.params.subscribe((params) => {
       this.reportId = params?.id ?? '';
@@ -129,8 +130,8 @@ export class ReportPage implements OnDestroy {
   /**
    * on file drop handler
    */
-  onFileDropped(event) {
-    this.uploadFiles(event);
+  onFileDropped(fileList: FileList) {
+    this.uploadFiles(fileList);
   }
 
   /**
