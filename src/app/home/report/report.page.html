@@ -8,52 +8,69 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="form" (ngSubmit)="onSave()">
-    <ion-item class="ion-margin-vertical">
-      <ion-label position="floating">Location</ion-label>
-      <ion-input type="text" placeholder="Location" autocomplete="off" formControlName="location"></ion-input>
-    </ion-item>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-xs="12" size-md="8" size-lg="6">
+        <form [formGroup]="form" (ngSubmit)="onSave()">
+          <ion-item class="ion-margin-vertical">
+            <ion-label position="floating">Location</ion-label>
+            <ion-input type="text" placeholder="Location" autocomplete="off" formControlName="location"></ion-input>
+          </ion-item>
 
-    <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">
-      <input
-        type="file"
-        #fileDropRef
-        id="fileDropRef"
-        multiple
-        (change)="fileBrowseHandler($any($event.target).files)"
-      />
-      <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
-      <span class="text">Drag and drop <br />or</span>
-      <label for="fileDropRef">Browse for files</label>
-    </div>
-    <ion-list class="ion-margin-top">
-      <ion-item *ngFor="let file of files | keyvalue;" class="single-file">
-        <ion-thumbnail slot="start">
-          <img
-            *ngIf="file.value?.file?.type.indexOf('image')> -1"
-            alt="uploaded media"
-            [src]="file.value?.prewiew ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'"
-          />
-          <video *ngIf="file.value?.file?.type.indexOf('video')> -1" [src]="file.value?.prewiew"></video>
-        </ion-thumbnail>
-        <ion-label class="info" slot="">
-          <h4 class="name">{{ file.value.name }}</h4>
-          <p class="size">{{file.value.size | formatBytes }}</p>
-          <ion-progress-bar [buffer]="file.value?.progress"></ion-progress-bar>
-        </ion-label>
-        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'success' " (click)="deleteFile(file.key)">
-          <ion-icon name="trash-outline" slot="icon-only" alt="remove"></ion-icon>
-        </ion-button>
-        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'uploading' ">
-          <ion-icon name="hourglass-outline" slot="icon-only" alt="uploading"></ion-icon>
-        </ion-button>
-        <ion-button slot="end" color="primary" *ngIf="file.value.state === 'failed' " (click)="uploadFile(file.key)">
-          <ion-icon name="hourglass-outline" slot="icon-only" alt="retry"></ion-icon>
-        </ion-button>
-      </ion-item>
-    </ion-list>
+          <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">
+            <input
+              type="file"
+              #fileDropRef
+              id="fileDropRef"
+              multiple
+              (change)="fileBrowseHandler($event)"
+              accept="media/*"
+            />
+            <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
+            <span class="text">Drag and drop <br />or</span>
+            <label for="fileDropRef">Browse for files</label>
+          </div>
+          <ion-list class="ion-margin-top">
+            <ion-item *ngFor="let file of files | keyvalue;" class="single-file">
+              <ion-thumbnail slot="start">
+                <img
+                  *ngIf="file.value?.file?.type.indexOf('image')> -1"
+                  alt="uploaded media"
+                  [src]="file.value?.prewiew ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'"
+                />
+                <video *ngIf="file.value?.file?.type.indexOf('video')> -1" [src]="file.value?.prewiew"></video>
+              </ion-thumbnail>
+              <ion-label class="info" slot="">
+                <h4 class="name">{{ file.value.name }}</h4>
+                <p class="size">{{file.value.size | formatBytes }}</p>
+                <ion-progress-bar [buffer]="file.value?.progress"></ion-progress-bar>
+              </ion-label>
+              <ion-button
+                slot="end"
+                color="primary"
+                *ngIf="file.value.state === 'success' "
+                (click)="deleteFile(file.key)"
+              >
+                <ion-icon name="trash-outline" slot="icon-only" alt="remove"></ion-icon>
+              </ion-button>
+              <ion-button slot="end" color="primary" *ngIf="file.value.state === 'uploading' ">
+                <ion-icon name="hourglass-outline" slot="icon-only" alt="uploading"></ion-icon>
+              </ion-button>
+              <ion-button
+                slot="end"
+                color="primary"
+                *ngIf="file.value.state === 'failed' "
+                (click)="uploadFile(file.key)"
+              >
+                <ion-icon name="hourglass-outline" slot="icon-only" alt="retry"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
 
-    <ion-button class="ion-margin-vertical" expand="block" type="submit" color="primary"> Save </ion-button>
-    <ion-button expand="block" type="button" color="medium" (click)="onDelete()"> Delete </ion-button>
-  </form>
+          <ion-button class="ion-margin-vertical" expand="block" type="submit" color="primary"> Save </ion-button>
+          <ion-button expand="block" type="button" color="medium" (click)="onDelete()"> Delete </ion-button>
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

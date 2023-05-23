@@ -14,71 +14,82 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-segment (ionChange)="onSegmentChanged($event)" value="drafts">
-    <ion-segment-button value="drafts">
-      <ion-label>Drafts</ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="reports">
-      <ion-label>Reports</ion-label>
-    </ion-segment-button>
-  </ion-segment>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-xs="12" size-md="8" size-lg="6">
+        <ion-segment (ionChange)="onSegmentChanged($event)" value="drafts">
+          <ion-segment-button value="drafts">
+            <ion-label>Drafts</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="reports">
+            <ion-label>Reports</ion-label>
+          </ion-segment-button>
+        </ion-segment>
 
-  <ng-container *ngIf="segment === 'drafts'">
-    <ion-list>
-      <ion-list-header>Drafts</ion-list-header>
-      <ion-item (click)="createNewDraft()" [button]="true" [detail]="true">
-        <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
-        <ion-label>
-          <h3>Create New</h3>
-          <p>Upload some media to get started</p>
-        </ion-label>
-      </ion-item>
-      <ion-item
-        *ngFor="let draft of drafts"
-        [routerLink]="['report', draft.id]"
-        routerDirection="forward"
-        [state]="{report: draft}"
-        [detail]="true"
-      >
-        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>{{draft.location}}</h3>
-          <p class="status">
-            <ion-text color="success"
-              ><ion-text color="medium">Status: </ion-text><span>{{draft.status | titlecase}}</span></ion-text
+        <ng-container *ngIf="segment === 'drafts'">
+          <ion-list>
+            <ion-list-header>Drafts</ion-list-header>
+            <ion-item (click)="createNewDraft()" [button]="true" [detail]="true">
+              <ion-icon name="add-circle-outline" slot="start" color="primary"></ion-icon>
+              <ion-label>
+                <h3>Create New</h3>
+                <p>Upload some media to get started</p>
+              </ion-label>
+            </ion-item>
+            <ion-item
+              *ngFor="let draft of drafts"
+              [routerLink]="['report', draft.id]"
+              routerDirection="forward"
+              [state]="{report: draft}"
+              [detail]="true"
             >
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-          </p>
-          <p>Created At: {{draft.createdAt | firestoreTimestamp }}</p>
-          <p>Updated At: {{draft.updatedAt | firestoreTimestamp }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ng-container>
+              <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+              <ion-label>
+                <h3>{{draft.location}}</h3>
+                <p class="status">
+                  <ion-text color="success"
+                    ><ion-text color="medium">Status: </ion-text><span>{{draft.status | titlecase}}</span></ion-text
+                  >
+                  <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+                </p>
+                <p>Created At: {{draft.createdAt | firestoreTimestamp }}</p>
+                <p>Updated At: {{draft.updatedAt | firestoreTimestamp }}</p>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-container>
 
-  <ng-container *ngIf="segment === 'reports'">
-    <ion-list>
-      <ion-list-header>Reports</ion-list-header>
-      <ion-item
-        *ngFor="let report of reports"
-        [routerLink]="['report', report.id]"
-        routerDirection="forward"
-        [state]="{report}"
-        [detail]="true"
-      >
-        <ion-icon name="list-circle-outline" slot="start"></ion-icon>
-        <ion-label>
-          <h3>{{report.location}}</h3>
-          <p class="status">
-            <ion-text color="success"
-              ><ion-text color="medium">Status: </ion-text><span>{{report.status | titlecase}}</span></ion-text
+        <ng-container *ngIf="segment === 'reports'">
+          <ion-list>
+            <ion-list-header>Reports</ion-list-header>
+            <ion-item
+              *ngFor="let report of reports"
+              [routerLink]="['report', report.id]"
+              routerDirection="forward"
+              [state]="{report}"
+              [detail]="true"
             >
-            <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
-          </p>
-          <p>Created At: {{report.createdAt | firestoreTimestamp }}</p>
-          <p>Updated At: {{report.updatedAt | firestoreTimestamp }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
-  </ng-container>
+              <ion-icon name="list-circle-outline" slot="start"></ion-icon>
+              <ion-label>
+                <h3>{{report.location}}</h3>
+                <p class="status">
+                  <ion-text color="success"
+                    ><ion-text color="medium">Status: </ion-text><span>{{report.status | titlecase}}</span></ion-text
+                  >
+                  <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+                </p>
+                <p>Created At: {{report.createdAt | firestoreTimestamp }}</p>
+                <p>Updated At: {{report.updatedAt | firestoreTimestamp }}</p>
+              </ion-label>
+            </ion-item>
+            <ion-item *ngIf="reports.length === 0">
+              <ion-label>
+                <h3>No reports found.</h3>
+              </ion-label>
+            </ion-item>
+          </ion-list>
+        </ng-container>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>

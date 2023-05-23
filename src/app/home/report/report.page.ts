@@ -136,8 +136,8 @@ export class ReportPage implements OnDestroy {
   /**
    * handle file from browsing
    */
-  fileBrowseHandler(files) {
-    this.uploadFiles(files);
+  fileBrowseHandler(event: Event) {
+    this.uploadFiles((event.target as HTMLInputElement).files);
   }
 
   /**
@@ -172,8 +172,6 @@ export class ReportPage implements OnDestroy {
       const result = await this.fileUploadService.uploadUnderReport(this.reportId, fileMetadata.file as File);
       await this.reportService.linkMedia(this.reportId, result.ref.fullPath);
       fileMetadata.state = 'success';
-      const objectURL = URL.createObjectURL(fileMetadata.file);
-      fileMetadata.prewiew = this.sanitizer.bypassSecurityTrustUrl(objectURL);
     } catch (error) {
       fileMetadata.state = 'failed';
     } finally {
@@ -187,8 +185,8 @@ export class ReportPage implements OnDestroy {
    *
    * @param files (Files List)
    */
-  uploadFiles(files: File[]) {
-    for (const file of files) {
+  uploadFiles(files: FileList) {
+    for (const file of Array.from(files)) {
       this.files.set(file.name, {
         file,
         name: file.name,
@@ -197,6 +195,13 @@ export class ReportPage implements OnDestroy {
         state: 'uploading',
       });
       this.uploadFile(file.name);
+
+      // Prepare preview
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.files.get(file.name).prewiew = reader.result as string;
+      };
+      reader.readAsDataURL(file);
     }
     this.fileDropEl.nativeElement.value = '';
   }

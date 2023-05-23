@@ -5,25 +5,33 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form [formGroup]="credentials" (ngSubmit)="login()">
-    <ion-item class="ion-margin-bottom">
-      <ion-input type="email" placeholder="Email" formControlName="email" autocomplete="email"></ion-input>
-      <ion-note slot="error" *ngIf="(email.dirty && email.touched) && email.errors">Invalid E-mail</ion-note>
-    </ion-item>
+  <ion-grid>
+    <ion-row class="ion-justify-content-center">
+      <ion-col size-xs="12" size-md="8" size-lg="6">
+        <form [formGroup]="credentials" (ngSubmit)="login()">
+          <ion-item class="ion-margin-bottom">
+            <ion-input type="email" placeholder="Email" formControlName="email" autocomplete="email"></ion-input>
+            <ion-note slot="error" *ngIf="(email.dirty && email.touched) && email.errors">Invalid E-mail</ion-note>
+          </ion-item>
 
-    <ion-item class="ion-margin-bottom">
-      <ion-input
-        type="password"
-        placeholder="Password"
-        formControlName="password"
-        autocomplete="current-password"
-      ></ion-input>
-      <ion-note slot="error" *ngIf="(password.dirty && password.touched) && password.errors"
-        >Password needs to be at least 6 characters</ion-note
-      >
-    </ion-item>
+          <ion-item class="ion-margin-bottom">
+            <ion-input
+              type="password"
+              placeholder="Password"
+              formControlName="password"
+              autocomplete="current-password"
+            ></ion-input>
+            <ion-note slot="error" *ngIf="(password.dirty && password.touched) && password.errors"
+              >Password needs to be at least 6 characters</ion-note
+            >
+          </ion-item>
 
-    <ion-button expand="full" type="submit" [disabled]="credentials.invalid">Login</ion-button>
-    <ion-button expand="full" type="button" (click)="register()" [disabled]="credentials.invalid">Register</ion-button>
-  </form>
+          <ion-button expand="full" type="submit" [disabled]="credentials.invalid">Login</ion-button>
+          <ion-button expand="full" type="button" (click)="register()" [disabled]="credentials.invalid"
+            >Register</ion-button
+          >
+        </form>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
