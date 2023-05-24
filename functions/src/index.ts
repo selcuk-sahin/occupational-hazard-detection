@@ -1,5 +1,3 @@
-import { Report } from '../../src/app/services/report.service';
-
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 admin.initializeApp();
@@ -7,8 +5,8 @@ admin.initializeApp();
 export const updateDocument = functions.firestore
   .document('users/{userId}/drafts/{draftId}')
   .onUpdate((change, context) => {
-    const newValue = change.after.data() as Report; // Updated document data
-    const previousValue = change.before.data() as Report; // Previous document data
+    const newValue = change.after.data() as any; // Updated document data
+    const previousValue = change.before.data() as any; // Previous document data
     const userId = context.params.userId; // User ID
     const draftId = context.params.draftId; // Draft ID
 
@@ -26,12 +24,12 @@ export const updateDocument = functions.firestore
     }
   });
 
-function analyzeReport(report: Report, userId: string) {
+function analyzeReport(report: any, userId: string) {
   // Implement your logic here
   console.log('I will analyze', { report }, 'for', { userId });
   return {
     outputFiles: ['users/VLPjOyV3gLYkqtzgHLiLfFD6i223/drafts/I0SWpFbhSlBrgPUeIE6N/IMG_7275.jpg'],
     status: 'completed',
-  } as Partial<Report>;
+  } as Partial<any>;
   // Perform any additional actions based on the updated values
 }
