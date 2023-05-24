@@ -25,11 +25,11 @@ interface FileMetadata {
 })
 export class ReportPage implements OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
-  form: FormGroup;
   files = new Map<string, FileMetadata>();
   pageMode: PageMode = 'update';
   reportId = '';
   report: Report;
+  location = '';
   subs = new SubSink();
 
   constructor(
@@ -39,7 +39,6 @@ export class ReportPage implements OnDestroy {
     private loadingCtrl: LoadingController,
     private alertService: AlertService,
     private fileUploadService: FileUploadService,
-    private fb: FormBuilder,
     private sanitizer: DomSanitizer,
     private navCtrl: NavController,
   ) {
@@ -90,9 +89,7 @@ export class ReportPage implements OnDestroy {
   }
 
   initForm(report?: Report) {
-    this.form = this.fb.group({
-      location: [report?.location, []],
-    });
+    this.location = report?.location;
   }
 
   async getReportDetail(id: string) {
@@ -114,10 +111,12 @@ export class ReportPage implements OnDestroy {
     try {
       await this.reportService.update({
         id: this.report.id,
-        location: this.form.controls.location.value,
-        status: this.report.status,
+        location: this.location,
+        status: 'analyzing',
       });
       this.alertService.showAlert({ header: 'Success', message: 'Your media will be analyzed soon.' });
+      this.report = undefined;
+      this.navCtrl.navigateBack(['/home']);
     } catch (error) {
       this.alertService.showAlert({ header: 'Failed to save', message: error?.message });
     } finally {

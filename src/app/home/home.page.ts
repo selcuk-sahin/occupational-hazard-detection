@@ -38,11 +38,14 @@ export class HomePage implements OnInit, OnDestroy {
       }
     });
     this.subs.sink = this.reportService.updated.subscribe((report) => {
-      if (report.status === 'draft') {
-        const index = this.drafts.findIndex((r) => r.id === report.id);
-        if (index !== -1) {
+      const index = this.drafts.findIndex((r) => r.id === report.id);
+      if (index !== -1) {
+        if (report.status === 'draft') {
           const existingReport = this.drafts[index];
           this.drafts[index] = { ...existingReport, ...report };
+        } else if (report.status === 'analyzing') {
+          const [draft] = this.drafts.splice(index, 1);
+          this.reports.push(draft);
         }
       }
     });

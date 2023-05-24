@@ -11,10 +11,19 @@
   <ion-grid>
     <ion-row class="ion-justify-content-center">
       <ion-col size-xs="12" size-md="8" size-lg="6">
-        <form [formGroup]="form" (ngSubmit)="onSave()">
+        <ion-label *ngIf="report.status === 'analyzing'">We are analyzing the data. Please check back soon.</ion-label>
+
+        <form (ngSubmit)="onSave()">
           <ion-item class="ion-margin-vertical">
             <ion-label position="floating">Location</ion-label>
-            <ion-input type="text" placeholder="Location" autocomplete="off" formControlName="location"></ion-input>
+            <ion-input
+              name="location"
+              type="text"
+              placeholder="Location"
+              autocomplete="off"
+              [(ngModel)]="location"
+              [disabled]="report.status === 'analyzing'"
+            ></ion-input>
           </ion-item>
 
           <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">
@@ -24,6 +33,7 @@
               id="fileDropRef"
               multiple
               (change)="fileBrowseHandler($event)"
+              [disabled]="report.status === 'analyzing'"
               accept="image/*"
             />
             <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
@@ -49,6 +59,7 @@
                 slot="end"
                 color="primary"
                 *ngIf="file.value.state === 'success' "
+                [disabled]="report.status === 'analyzing'"
                 (click)="deleteFile(file.key)"
               >
                 <ion-icon name="trash-outline" slot="icon-only" alt="remove"></ion-icon>
@@ -59,7 +70,8 @@
               <ion-button
                 slot="end"
                 color="primary"
-                *ngIf="file.value.state === 'failed' "
+                *ngIf="file.value.state === 'failed'"
+                [disabled]="report.status === 'analyzing'"
                 (click)="uploadFile(file.key)"
               >
                 <ion-icon name="hourglass-outline" slot="icon-only" alt="retry"></ion-icon>
@@ -67,8 +79,24 @@
             </ion-item>
           </ion-list>
 
-          <ion-button class="ion-margin-vertical" expand="block" type="submit" color="primary"> Save </ion-button>
-          <ion-button expand="block" type="button" color="medium" (click)="onDelete()"> Delete </ion-button>
+          <ion-button
+            class="ion-margin-vertical"
+            expand="block"
+            type="submit"
+            color="primary"
+            [disabled]="report.status === 'analyzing'"
+          >
+            Save
+          </ion-button>
+          <ion-button
+            expand="block"
+            type="button"
+            color="medium"
+            (click)="onDelete()"
+            [disabled]="report.status === 'analyzing'"
+          >
+            Delete
+          </ion-button>
         </form>
       </ion-col>
     </ion-row>
