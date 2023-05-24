@@ -94,10 +94,9 @@ export class HomePage implements OnInit, OnDestroy {
 
   async getReports() {
     try {
-      [this.drafts, this.reports] = await Promise.all([
-        this.reportService.getReports('drafts'),
-        this.reportService.getReports('reports'),
-      ]);
+      const reports = await this.reportService.getReports('drafts');
+      this.drafts = reports.filter((r) => r.status !== 'completed');
+      this.reports = reports.filter((r) => r.status === 'completed');
     } catch (error) {
       this.alertService.showAlert({ header: 'Error', message: 'Failed to fetch reports.' });
     }
