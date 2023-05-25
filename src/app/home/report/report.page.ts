@@ -102,6 +102,17 @@ export class ReportPage implements OnDestroy {
   }
 
   async onSave() {
+    // Validate form
+    if (!this.location) {
+      return this.alertService.showAlert({ message: 'Please select a location' });
+    }
+    if (this.files.size === 0) {
+      return this.alertService.showAlert({ message: 'Please upload your images' });
+    }
+    if (this.hasUnfinishedUploads()) {
+      return this.alertService.showAlert({ message: 'Please wait uploading images' });
+    }
+
     const loading = await this.loadingCtrl.create();
     loading.present();
     try {
@@ -212,5 +223,16 @@ export class ReportPage implements OnDestroy {
       reader.readAsDataURL(file);
     }
     this.fileDropEl.nativeElement.value = '';
+  }
+
+  hasUnfinishedUploads() {
+    let result = false;
+    // Iterate over the map to find the item with progress less than 100
+    this.files.forEach((fileMetadata, key) => {
+      if (fileMetadata.progress < 100) {
+        result = true;
+      }
+    });
+    return result;
   }
 }
