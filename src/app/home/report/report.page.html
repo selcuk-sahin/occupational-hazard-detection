@@ -12,7 +12,7 @@
     <ion-row class="ion-justify-content-center">
       <ion-col size-xs="12" size-md="8" size-lg="6">
         <ng-container *ngIf="reportService.pageMode !== 'view' else viewReport">
-          <ion-label *ngIf="report.status === 'analyzing'"
+          <ion-label *ngIf="report?.status === 'analyzing'"
             >We are analyzing the data. Please check back soon.</ion-label
           >
 
@@ -25,7 +25,7 @@
                 placeholder="Location"
                 autocomplete="off"
                 [(ngModel)]="location"
-                [disabled]="report.status === 'analyzing'"
+                [disabled]="report?.status === 'analyzing'"
               ></ion-input>
             </ion-item>
 
@@ -36,7 +36,7 @@
                 id="fileDropRef"
                 multiple
                 (change)="fileBrowseHandler($event)"
-                [disabled]="report.status === 'analyzing'"
+                [disabled]="report?.status === 'analyzing'"
                 accept="image/*"
               />
               <ion-icon name="cloud-upload-outline" alt="upload" size="large"></ion-icon>
@@ -62,7 +62,7 @@
                   slot="end"
                   color="primary"
                   *ngIf="file.value.state === 'success' "
-                  [disabled]="report.status === 'analyzing'"
+                  [disabled]="report?.status === 'analyzing'"
                   (click)="deleteFile(file.key)"
                 >
                   <ion-icon name="trash-outline" slot="icon-only" alt="remove"></ion-icon>
@@ -74,7 +74,7 @@
                   slot="end"
                   color="primary"
                   *ngIf="file.value.state === 'failed'"
-                  [disabled]="report.status === 'analyzing'"
+                  [disabled]="report?.status === 'analyzing'"
                   (click)="uploadFile(file.key)"
                 >
                   <ion-icon name="hourglass-outline" slot="icon-only" alt="retry"></ion-icon>
@@ -87,7 +87,7 @@
               expand="block"
               type="submit"
               color="primary"
-              [disabled]="report.status === 'analyzing'"
+              [disabled]="report?.status === 'analyzing'"
             >
               Save
             </ion-button>
@@ -96,7 +96,7 @@
               type="button"
               color="medium"
               (click)="onDelete()"
-              [disabled]="report.status === 'analyzing'"
+              [disabled]="report?.status === 'analyzing'"
             >
               Delete
             </ion-button>
