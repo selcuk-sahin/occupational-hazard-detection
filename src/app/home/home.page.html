@@ -36,13 +36,7 @@
                 <p>Upload some media to get started</p>
               </ion-label>
             </ion-item>
-            <ion-item
-              *ngFor="let draft of drafts"
-              [routerLink]="['report', draft.id]"
-              routerDirection="forward"
-              [state]="{report: draft}"
-              [detail]="true"
-            >
+            <ion-item *ngFor="let draft of drafts" (click)="updateDraft(draft)" [detail]="true">
               <ion-icon name="list-circle-outline" slot="start"></ion-icon>
               <ion-label>
                 <h3>{{draft.location}}</h3>
@@ -62,13 +56,7 @@
         <ng-container *ngIf="segment === 'reports'">
           <ion-list>
             <ion-list-header>Reports</ion-list-header>
-            <ion-item
-              *ngFor="let report of reports"
-              [routerLink]="['report', report.id]"
-              routerDirection="forward"
-              [state]="{report}"
-              [detail]="true"
-            >
+            <ion-item *ngFor="let report of reports" (click)="viewReport(report)" [detail]="true">
               <ion-icon name="list-circle-outline" slot="start"></ion-icon>
               <ion-label>
                 <h3>{{report.location}}</h3>

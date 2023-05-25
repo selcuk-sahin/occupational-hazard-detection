@@ -67,8 +67,9 @@ export class HomePage implements OnInit, OnDestroy {
     try {
       const report = await this.reportService.create();
       await loading.dismiss();
+      this.reportService.pageMode = 'create';
       await this.navCtrl.navigateForward(['report/', report.id], {
-        state: { report, create: true },
+        state: { report },
         relativeTo: this.route,
       });
     } catch (error) {
@@ -76,6 +77,22 @@ export class HomePage implements OnInit, OnDestroy {
     } finally {
       loading.dismiss();
     }
+  }
+
+  updateDraft(report: Report) {
+    this.reportService.pageMode = 'update';
+    return this.navCtrl.navigateForward(['report/', report.id], {
+      state: { report },
+      relativeTo: this.route,
+    });
+  }
+
+  viewReport(report: Report) {
+    this.reportService.pageMode = 'view';
+    return this.navCtrl.navigateForward(['report/', report.id], {
+      state: { report },
+      relativeTo: this.route,
+    });
   }
 
   async logout() {

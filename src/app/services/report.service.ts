@@ -34,10 +34,13 @@ export class Report {
   }
 }
 
+type PageMode = 'create' | 'update' | 'view';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ReportService {
+  pageMode: PageMode = 'create';
   created = new EventEmitter<Report>();
   updated = new EventEmitter<Partial<Report>>();
   deleted = new EventEmitter<Report['id']>();

@@ -6,7 +6,6 @@ import { AlertService } from 'src/app/services/alert.service';
 import { FileUploadService } from 'src/app/services/file-upload.service';
 import { Report, ReportService } from 'src/app/services/report.service';
 import { SubSink } from 'subsink';
-type PageMode = 'create' | 'update';
 
 interface FileMetadata {
   file?: File | Blob;
@@ -25,7 +24,6 @@ interface FileMetadata {
 export class ReportPage implements OnDestroy {
   @ViewChild('fileDropRef') fileDropEl: ElementRef;
   files = new Map<string, FileMetadata>();
-  pageMode: PageMode = 'update';
   reportId = '';
   report: Report;
   location = '';
@@ -34,7 +32,7 @@ export class ReportPage implements OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private reportService: ReportService,
+    public reportService: ReportService,
     private loadingCtrl: LoadingController,
     private alertService: AlertService,
     private fileUploadService: FileUploadService,
@@ -43,7 +41,6 @@ export class ReportPage implements OnDestroy {
   ) {
     const navigation = this.router.getCurrentNavigation();
     const state = navigation.extras.state;
-    this.pageMode = state && state?.create ? 'create' : 'update';
     this.initForm(state?.report as Report);
     if (state?.report) this.report = state?.report as Report;
 
