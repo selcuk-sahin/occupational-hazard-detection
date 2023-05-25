@@ -90,7 +90,7 @@
               color="primary"
               [disabled]="report?.status === 'analyzing'"
             >
-              Save
+              Analyze
             </ion-button>
             <ion-button
               expand="block"
@@ -108,4 +108,26 @@
   </ion-grid>
 </ion-content>
 
-<ng-template #viewReport> View REPORT </ng-template>
+<ng-template #viewReport>
+  <ion-item class="ion-margin-vertical">
+    <ion-label position="floating">Location</ion-label>
+    <ion-input
+      name="location"
+      type="text"
+      placeholder="Location"
+      autocomplete="off"
+      [value]="location"
+      [readonly]="true"
+    ></ion-input>
+  </ion-item>
+  <ion-list class="ion-margin-top">
+    <ion-item *ngFor="let file of files | keyvalue;">
+      <img
+        *ngIf="file.value?.file?.type.indexOf('image')> -1"
+        alt="uploaded media"
+        [src]="file.value?.prewiew ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'"
+      />
+      <video *ngIf="file.value?.file?.type.indexOf('video')> -1" [src]="file.value?.prewiew"></video>
+    </ion-item>
+  </ion-list>
+</ng-template>

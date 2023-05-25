@@ -86,6 +86,9 @@ export class ReportPage implements OnDestroy {
 
   initForm(report?: Report) {
     this.location = report?.location;
+    if (report?.status === 'completed') {
+      this.reportService.pageMode = 'view';
+    }
   }
 
   async getReportDetail(id: string) {
