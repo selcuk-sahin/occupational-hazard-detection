@@ -1,28 +1,27 @@
-import * as functions from 'firebase-functions';
-import * as admin from 'firebase-admin';
-admin.initializeApp();
+import { onDocumentUpdated } from 'firebase-functions/v2/firestore';
+import { initializeApp } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+initializeApp();
 
-export const updateDocument = functions.firestore
-  .document('users/{userId}/drafts/{draftId}')
-  .onUpdate((change, context) => {
-    const newValue = change.after.data() as any; // Updated document data
-    const previousValue = change.before.data() as any; // Previous document data
-    const userId = context.params.userId; // User ID
-    const draftId = context.params.draftId; // Draft ID
+export const updateDocument = onDocumentUpdated('users/{userId}/drafts/{draftId}', (event) => {
+  const newValue = event.data?.after as any; // Updated document data
+  const previousValue = event.data?.before as any; // Previous document data
+  const userId = event.params.userId; // User ID
+  const draftId = event.params.draftId; // Draft ID
 
-    if (newValue.status === 'analyzing' && previousValue.status === 'draft') {
-      // analyze & update
-      // Call your desired function here
-      const result = analyzeReport(newValue, userId);
+  if (newValue.status === 'analyzing' && previousValue.status === 'draft') {
+    // analyze & update
+    // Call your desired function here
+    const result = analyzeReport(newValue, userId);
 
-      // Perform additional updates to Firestore if needed
-      const db = admin.firestore();
-      const docRef = db.collection('users').doc(userId).collection('drafts').doc(draftId);
-      return docRef.update(result);
-    } else {
-      return;
-    }
-  });
+    // Perform additional updates to Firestore if needed
+    const db = getFirestore();
+    const docRef = db.collection('users').doc(userId).collection('drafts').doc(draftId);
+    return docRef.update(result);
+  } else {
+    return;
+  }
+});
 
 function analyzeReport(report: any, userId: string) {
   // Implement your logic here
