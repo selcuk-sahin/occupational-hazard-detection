@@ -25,7 +25,7 @@ def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
     try:
       ## Analyze
       # get output files
-      output_files: ['users/VLPjOyV3gLYkqtzgHLiLfFD6i223/drafts/I0SWpFbhSlBrgPUeIE6N/IMG_7275.jpg']
+      output_files = analyze_report(new_value)
 
       # set status
       new_value['outputFiles'] = output_files
@@ -34,8 +34,10 @@ def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
       new_value['status'] = 'failed'
 
     # Update the status
-    event.data.after.reference.update({"status", new_value['status']})
-    event.data.after.reference.update({"outputFiles", new_value['outputFiles']})
+    event.data.after.reference.update({
+      "status" : new_value['status'],
+      "outputFiles" : new_value['outputFiles']
+    })
     return
 
   else:
