@@ -14,7 +14,6 @@ from firebase_functions.firestore_fn import (
   Change,
   DocumentSnapshot,
 )
-
 from firebase_functions.options import (
   MemoryOption
 )
@@ -26,7 +25,7 @@ from PIL import Image
 from io import BytesIO
 
 app = initialize_app()
-bucket = storage.bucket('occupational-hazard-detection.appspot.com', app)
+bucket = storage.bucket()
 
 @on_document_updated(document="users/{userId}/drafts/{draftId}", timeout_sec=540, memory=MemoryOption.GB_1)
 def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
@@ -106,7 +105,7 @@ def analyze_report(draft: dict) -> list:
   pet_dictionary = {"15.0": "Cat", "16.0": "Dog"}
   other_dictionary = {"60.0": "Table"}
   fork_knife_dictionary= {"42.0": "Fork", "43.0": "Knife", "79.0": "Toothbrush"}
-  furniture_dictionary = { "56.0": "Chair", "57.0": "Couch", "58.0": "Bed"}
+  furniture_dictionary = { "56.0": "Chair", "57.0": "Couch", "59.0": "Bed"}
 
   #prefixes
   spillable_prefixes = ["39.0", "40.0", "41.0"]
@@ -115,8 +114,8 @@ def analyze_report(draft: dict) -> list:
   table_prefixes = ["60.0"]
   electronic_prefixes = ["62.0", "63.0"]
   fork_knife_prefixes = ["42.0", "43.0"]
-  furniture_prefixes = ["56.0", "57.0", "58.0"]
-  detectable_classes = [15, 16, 39, 40, 41, 60, 62, 63, 75, 42, 43, 56, 57, 58]
+  furniture_prefixes = ["56.0", "57.0", "59.0"]
+  detectable_classes = [15, 16, 39, 40, 41, 60, 62, 63, 75, 42, 43, 56, 57, 59]
 
   # Results
   output_text_list = []
