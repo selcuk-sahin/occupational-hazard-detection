@@ -27,7 +27,7 @@ from io import BytesIO
 app = initialize_app()
 bucket = storage.bucket()
 
-@on_document_updated(document="users/{userId}/drafts/{draftId}", timeout_sec=540, memory=MemoryOption.GB_1)
+@on_document_updated(document="users/{userId}/drafts/{draftId}", timeout_sec=540, memory=MemoryOption.GB_1, max_instances=1)
 def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
   userId = event.params['userId']
   draftId = event.params['draftId']
@@ -281,31 +281,35 @@ def find_breakable_objects(list1, list2, limit):
         temp_list.append((classid1, classid2, convert_distance_value(distance)))
   return temp_list
 
-def convert_list(inputList, dictionary1, dictionary2, convertionFormat:int, output_text_list):
-    for item in inputList:
-        obj1, obj2, value = item
-        if obj1 in dictionary1:
-            obj1_name = dictionary1[obj1]
-        else:
-            obj1_name = obj1
-        if obj2 in dictionary2:
-            obj2_name = dictionary2[obj2]
-        else:
-            obj2_name = obj2
-        if convertionFormat == 1:
-            output_text_list.append((f"{obj1_name} is {value} to {obj2_name}"))
-        elif convertionFormat == 2:
-            output_text_list.append((f"{obj1_name} is {value} to {obj2_name}. {obj2_name} can break the {obj1_name}"))
-        elif convertionFormat == 3:
-            output_text_list.append((f"{obj1_name} is on the {obj2_name}. Inappropriate place for {obj1_name}"))
-    return output_text_list
+def convert_list(inputList, dictionary1, dictionary2, convertionFormat, output_text_list):
+  for item in inputList:
+    obj1, obj2, value = item
+    if obj1 in dictionary1:
+      obj1_name = dictionary1[obj1]
+    else:
+      obj1_name = obj1
+    if obj2 in dictionary2:
+      obj2_name = dictionary2[obj2]
+    else:
+      obj2_name = obj2
+    if convertionFormat == 1:
+      if value == "nearby of":
+        output_text_list.append((f'{obj1_name} is {value} {obj2_name}.'))
+      output_text_list.append((f'{obj1_name} is {value} to {obj2_name}. Spilling of {obj1_name} may damage {obj2_name}.'))
+    elif convertionFormat == 2:
+      output_text_list.append((f'{obj1_name} is {value} to {obj2_name}. {obj2_name} can break the {obj1_name}'))
+    elif convertionFormat == 3:
+      output_text_list.append((f'{obj1_name} is on the {obj2_name}. Inappropriate place for {obj1_name}'))
+  return output_text_list
 
 def convert_distance_value(value):
   if value < 0.1:
     return "dangerously close"
   elif 0.1 <= value < 0.3:
     return "really close"
-  elif 0.3 <= value < 0.5:
+  elif 0.3 <= value < 0.4:
     return "close"
+  elif 0.4 <= value < 0.5:
+    return "nearby of"
   else:
     return "around"
