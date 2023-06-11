@@ -41,10 +41,14 @@
               <ion-label>
                 <h3>{{draft.location}}</h3>
                 <p class="status">
-                  <ion-text color="success"
+                  <ion-text [color]="draft.status === 'completed' ? 'success' : 'warning'"
                     ><ion-text color="medium">Status: </ion-text><span>{{draft.status | titlecase}}</span></ion-text
                   >
-                  <ion-icon name="checkmark-circle-outline" slot="start" color="success"></ion-icon>
+                  <ion-icon
+                    slot="start"
+                    [name]="draft.status === 'completed' ? 'checkmark-circle-outline' : 'reader-outline'"
+                    [color]="draft.status === 'completed' ? 'success' : 'warning'"
+                  ></ion-icon>
                 </p>
                 <p>Created At: {{draft.createdAt | firestoreTimestamp }}</p>
                 <p>Updated At: {{draft.updatedAt | firestoreTimestamp }}</p>

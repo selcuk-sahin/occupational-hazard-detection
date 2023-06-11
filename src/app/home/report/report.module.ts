@@ -9,6 +9,7 @@ import { ReportPageRoutingModule } from './report-routing.module';
 import { ReportPage } from './report.page';
 import { DragAndDropDirectiveModule } from 'src/app/directives/drag-and-drop.directive';
 import { FormatBytesPipeModule } from 'src/app/pipes/format-bytes.pipe';
+import { CamelcaseToTitlecasePipe } from 'src/app/pipes/camelcase-to-titlecase.pipe';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { FormatBytesPipeModule } from 'src/app/pipes/format-bytes.pipe';
     ReportPageRoutingModule,
     DragAndDropDirectiveModule,
     FormatBytesPipeModule,
+    CamelcaseToTitlecasePipe,
   ],
   declarations: [ReportPage],
 })

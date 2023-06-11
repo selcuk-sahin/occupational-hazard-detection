@@ -19,15 +19,18 @@
           <form (ngSubmit)="onSave()">
             <ion-item class="ion-margin-vertical">
               <ion-label position="floating">Location</ion-label>
-              <ion-input
+              <ion-select
                 name="location"
-                type="text"
                 placeholder="Location"
                 autocomplete="off"
                 [(ngModel)]="location"
                 [disabled]="report?.status === 'analyzing'"
                 [required]="true"
-              ></ion-input>
+              >
+                <ion-select-option *ngFor="let location of locations" [value]="location"
+                  >{{location | camelcaseToTitlecase | titlecase}}</ion-select-option
+                >
+              </ion-select>
             </ion-item>
 
             <div class="file-upload-container" appDragAndDrop (fileDropped)="onFileDropped($event)">

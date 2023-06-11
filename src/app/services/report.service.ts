@@ -13,12 +13,17 @@ import {
 import { updateDoc } from '@firebase/firestore';
 import { AuthService } from './auth.service';
 
+export interface FileResult {
+  file: string;
+  description: string;
+}
+
 export class Report {
   id: string;
-  location: string;
+  location: typeof ReportService.locations[number] | '';
   status: 'draft' | 'analyzing' | 'completed';
   inputFiles: string[];
-  outputFiles: string[];
+  outputFiles: FileResult[];
   requestedAt: Timestamp;
   createdAt: Timestamp;
   updatedAt: Timestamp;
@@ -40,6 +45,7 @@ type PageMode = 'create' | 'update' | 'view';
   providedIn: 'root',
 })
 export class ReportService {
+  static locations = ['livingRoom', 'office', 'kitchen', 'bedroom', 'bathroom'] as const;
   pageMode: PageMode = 'create';
   created = new EventEmitter<Report>();
   updated = new EventEmitter<Partial<Report>>();

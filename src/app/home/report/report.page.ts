@@ -26,7 +26,7 @@ export class ReportPage implements OnDestroy {
   files = new Map<string, FileMetadata>();
   reportId = '';
   report: Report;
-  location = '';
+  location: Report['location'];
   subs = new SubSink();
 
   constructor(
@@ -55,6 +55,10 @@ export class ReportPage implements OnDestroy {
         this.alertService.showAlert({ message: 'Report not found' });
       }
     });
+  }
+
+  get locations() {
+    return ReportService.locations;
   }
 
   ngOnDestroy(): void {
