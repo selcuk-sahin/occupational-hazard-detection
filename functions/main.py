@@ -15,6 +15,10 @@ from firebase_functions.firestore_fn import (
   DocumentSnapshot,
 )
 
+from firebase_functions.options import (
+  MemoryOption
+)
+
 # Detection
 import math
 from ultralytics import YOLO
@@ -24,7 +28,7 @@ from io import BytesIO
 app = initialize_app()
 bucket = storage.bucket('occupational-hazard-detection.appspot.com', app)
 
-@on_document_updated(document="users/{userId}/drafts/{draftId}")
+@on_document_updated(document="users/{userId}/drafts/{draftId}", timeout_sec=540, memory=MemoryOption.GB_1)
 def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
   userId = event.params['userId']
   draftId = event.params['draftId']
