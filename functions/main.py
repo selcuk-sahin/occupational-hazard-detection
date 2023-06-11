@@ -4,7 +4,6 @@
 
 # Admin
 from firebase_admin import initialize_app
-# from firebase_admin import credentials
 from firebase_admin import storage
 
 # Functions
@@ -88,7 +87,7 @@ def analyze_report(draft: dict) -> list:
   furnitures = []
   forkKnifeTb = []
 
-  #others
+  # Results
   output_text_list = []
   isBreakable = False
   isSpillable = False
@@ -96,7 +95,7 @@ def analyze_report(draft: dict) -> list:
   isTable = False
   isElectronic = False
   isForkKnifeTb = False
-  isFurniture= False
+  isFurniture = False
 
   #Dictionary definitions
   spillable_dictionary = {"39.0": "Bottle", "40.0": "Wine Glass", "41.0": "Cup"}
@@ -117,24 +116,13 @@ def analyze_report(draft: dict) -> list:
   furniture_prefixes = ["56.0", "57.0", "59.0"]
   detectable_classes = [15, 16, 39, 40, 41, 60, 62, 63, 75, 42, 43, 56, 57, 59]
 
-  # Results
-  output_text_list = []
-  isBreakable = False
-  isSpillable = False
-  isPet = False
-  isTable = False
-  isElectronic = False
-  isForkKnifeTb = False
-  isFurniture= False
-
   """Load Images from GCS"""
   #start with 1 image
-  print(draft["inputFiles"][0])
   image = get_image_from_storage(draft["inputFiles"][0])
 
   # Predict
   model = YOLO("yolov8n.pt")
-  results = model.predict(source=image, classes=detectable_classes, save=True, save_txt=True)
+  results = model.predict(source=image, classes=detectable_classes)
   names = model.names
 
   #sonuçlar işlenmek üzere hazırlanır
@@ -181,13 +169,12 @@ def analyze_report(draft: dict) -> list:
     if isForkKnifeTb:
       list_maker(boxes,furniture_prefixes,furnitures)
       list_maker(boxes,fork_knife_prefixes,forkKnifeTb)
-      isOnIt = find_is_close_to_table(furnitures, forkKnifeTb)
-      if isOnIt > 0.7:
-        tempList = find_close_objects(furnitures, forkKnifeTb, 0.5)
+      isOnIt = find_is_close_to_table(forkKnifeTb, furnitures)
+      if isOnIt > 0.02:
+        tempList = find_close_objects(forkKnifeTb, furnitures, 0.5)
         if len(tempList) > 0:
           convert_list(tempList, fork_knife_dictionary, furniture_dictionary, 3, output_text_list)
 
-  print(output_text_list)
   return output_text_list
 
 #kontrol edilecek nesneler var mı kontrolü
@@ -293,14 +280,16 @@ def convert_list(inputList, dictionary1, dictionary2, convertionFormat, output_t
     else:
       obj2_name = obj2
     if convertionFormat == 1:
+      print("found entry, convertionFormat 1")
       if value == "nearby of":
         output_text_list.append((f'{obj1_name} is {value} {obj2_name}.'))
       output_text_list.append((f'{obj1_name} is {value} to {obj2_name}. Spilling of {obj1_name} may damage {obj2_name}.'))
     elif convertionFormat == 2:
+      print("found entry, convertionFormat 2")
       output_text_list.append((f'{obj1_name} is {value} to {obj2_name}. {obj2_name} can break the {obj1_name}'))
     elif convertionFormat == 3:
+      print("found entry, convertionFormat 3")
       output_text_list.append((f'{obj1_name} is on the {obj2_name}. Inappropriate place for {obj1_name}'))
-  return output_text_list
 
 def convert_distance_value(value):
   if value < 0.1:
