@@ -10,6 +10,7 @@ export const environment = {
     apiKey: 'AIzaSyDhumLL8pLRyomCTuNCr7mrK9ZvjOgPMHc',
     authDomain: 'occupational-hazard-detection.firebaseapp.com',
     messagingSenderId: '917633198578',
+    databaseURL: 'http://localhost:9001?ns=occupational-hazard-detection',
   },
   production: false,
 };
