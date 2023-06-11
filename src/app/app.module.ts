@@ -9,9 +9,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFunctions, getFunctions } from '@angular/fire/functions';
+import { provideFunctions, getFunctions, connectFunctionsEmulator } from '@angular/fire/functions';
 import { provideStorage, getStorage } from '@angular/fire/storage';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
+import { provideFirestore, getFirestore, connectFirestoreEmulator } from '@angular/fire/firestore';
 import { DragAndDropDirectiveModule } from './directives/drag-and-drop.directive';
 import { FormatBytesPipeModule } from './pipes/format-bytes.pipe';
 import { FirestoreTimestampPipeModule } from './pipes/firestore-timestamp.pipe';
@@ -24,9 +24,19 @@ import { FirestoreTimestampPipeModule } from './pipes/firestore-timestamp.pipe';
     AppRoutingModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
-    provideFunctions(() => getFunctions()),
+    provideFunctions(() => {
+      if (!environment.production) {
+        connectFunctionsEmulator(getFunctions(), 'localhost', 5001);
+      }
+      return getFunctions();
+    }),
     provideStorage(() => getStorage()),
-    provideFirestore(() => getFirestore()),
+    provideFirestore(() => {
+      if (!environment.production) {
+        connectFirestoreEmulator(getFirestore(), 'localhost', 9001);
+      }
+      return getFirestore();
+    }),
     DragAndDropDirectiveModule,
     FormatBytesPipeModule,
     FirestoreTimestampPipeModule,
