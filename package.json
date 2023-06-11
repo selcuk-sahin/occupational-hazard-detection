@@ -12,7 +12,7 @@
     "format": "npx prettier 'src/**/*.{js,jsx,ts,tsx,html,css,scss}' --write",
     "e2e": "ng e2e",
     "deploy": "ng build && firebase deploy",
-    "python:activate": "cd functions-python && source venv/bin/activate && python3.11 -m pip install -r requirements.txt"
+    "python:activate": "cd functions && source venv/bin/activate && python3.11 -m pip install -r requirements.txt"
   },
   "private": true,
   "dependencies": {
