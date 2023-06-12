@@ -119,18 +119,22 @@
       type="text"
       placeholder="Location"
       autocomplete="off"
-      [value]="location"
+      [value]="location | camelcaseToTitlecase"
       [readonly]="true"
     ></ion-input>
   </ion-item>
   <ion-list class="ion-margin-top">
-    <ion-item *ngFor="let file of files | keyvalue;">
-      <img
-        *ngIf="file.value?.file?.type.indexOf('image')> -1"
-        alt="uploaded media"
-        [src]="file.value?.prewiew ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'"
-      />
-      <video *ngIf="file.value?.file?.type.indexOf('video')> -1" [src]="file.value?.prewiew"></video>
-    </ion-item>
+    <ion-list-header>
+      <ion-label>Analyzed Images</ion-label>
+    </ion-list-header>
+    <ng-container *ngIf="report">
+      <ng-container *ngFor="let result of report.outputFiles;">
+        <div class="ion-margin-bottom ion-padding ion-text-center" *ngIf="report">
+          <img alt="uploaded media" [src]="result.file ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'" />
+          <p *ngFor="let output of result.outputTexts">{{output}}</p>
+          <p *ngIf="result.outputTexts.length <= 0">No problem can be found.</p>
+        </div>
+      </ng-container>
+    </ng-container>
   </ion-list>
 </ng-template>

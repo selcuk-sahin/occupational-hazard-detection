@@ -37,8 +37,13 @@ def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
     # analyze & update here
     try:
       ## Analyze
-      # get output files
-      output_files = analyze_report(new_value)
+      output_files = []
+      # get output files & detection results
+      for file in new_value["inputFiles"]:
+        image = get_image_from_storage(file)
+        output_texts = analyze_image(new_value, image)
+        ## TODO output file instead of input
+        output_files.append({'outputTexts': output_texts, 'file': file})
 
       # set status
       new_value['outputFiles'] = output_files
@@ -65,7 +70,7 @@ def get_image_from_storage(image_path):
 
     return image
 
-def analyze_report(draft: dict) -> list:
+def analyze_image(draft: dict, image: Image) -> list:
   """Load model from GCS"""
   # bucket_name = "occupational-hazard-detection.appspot.com"
   # model_name =  "detection-models/yolov8n.pt"
@@ -115,10 +120,6 @@ def analyze_report(draft: dict) -> list:
   fork_knife_prefixes = ["42.0", "43.0"]
   furniture_prefixes = ["56.0", "57.0", "59.0"]
   detectable_classes = [15, 16, 39, 40, 41, 60, 62, 63, 75, 42, 43, 56, 57, 59]
-
-  """Load Images from GCS"""
-  #start with 1 image
-  image = get_image_from_storage(draft["inputFiles"][0])
 
   # Predict
   model = YOLO("yolov8n.pt")

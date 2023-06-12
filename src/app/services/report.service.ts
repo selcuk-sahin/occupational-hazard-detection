@@ -15,7 +15,7 @@ import { AuthService } from './auth.service';
 
 export interface FileResult {
   file: string;
-  description: string;
+  outputTexts: string[];
 }
 
 export class Report {

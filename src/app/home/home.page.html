@@ -39,7 +39,7 @@
             <ion-item *ngFor="let draft of drafts" (click)="updateDraft(draft)" [detail]="true">
               <ion-icon name="list-circle-outline" slot="start"></ion-icon>
               <ion-label>
-                <h3>{{draft.location}}</h3>
+                <h3>{{draft.location | camelcaseToTitlecase}}</h3>
                 <p class="status">
                   <ion-text [color]="draft.status === 'completed' ? 'success' : 'warning'"
                     ><ion-text color="medium">Status: </ion-text><span>{{draft.status | titlecase}}</span></ion-text
@@ -63,7 +63,7 @@
             <ion-item *ngFor="let report of reports" (click)="viewReport(report)" [detail]="true">
               <ion-icon name="list-circle-outline" slot="start"></ion-icon>
               <ion-label>
-                <h3>{{report.location}}</h3>
+                <h3>{{report.location | camelcaseToTitlecase}}</h3>
                 <p class="status">
                   <ion-text color="success"
                     ><ion-text color="medium">Status: </ion-text><span>{{report.status | titlecase}}</span></ion-text
