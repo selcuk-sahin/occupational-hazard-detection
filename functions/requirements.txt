@@ -1,4 +1,64 @@
 firebase_functions~=0.1.0
 google-cloud-storage
-ultralytics
-Pillow
+
+# Ultralytics requirements
+./ultralytics-main
+# Usage: pip install -r requirements.txt
+
+# Base ----------------------------------------
+matplotlib>=3.2.2
+opencv-python-headless>=4.6.0
+Pillow>=7.1.2
+PyYAML>=5.3.1
+requests>=2.23.0
+scipy>=1.4.1
+torch>=1.7.0
+torchvision>=0.8.1
+tqdm>=4.64.0
+
+# Logging -------------------------------------
+# tensorboard>=2.13.0
+# dvclive>=2.11.0
+# clearml
+# comet
+
+# Plotting ------------------------------------
+pandas>=1.1.4
+seaborn>=0.11.0
+
+# Export --------------------------------------
+# coremltools>=6.0  # CoreML export
+# onnx>=1.12.0  # ONNX export
+# onnxsim>=0.4.1  # ONNX simplifier
+# nvidia-pyindex  # TensorRT export
+# nvidia-tensorrt  # TensorRT export
+# scikit-learn==0.19.2  # CoreML quantization
+# tensorflow>=2.4.1  # TF exports (-cpu, -aarch64, -macos)
+# tflite-support
+# tensorflowjs>=3.9.0  # TF.js export
+# openvino-dev>=2022.3  # OpenVINO export
+
+# Extras --------------------------------------
+psutil  # system utilization
+# thop>=0.1.1  # FLOPs computation
+# ipython  # interactive notebook
+# albumentations>=1.0.3
+# pycocotools>=2.0.6  # COCO mAP
+# roboflow
+
+# Installed by default in Google
+# click==8.0.3
+# cloudevents==1.2.0
+# deprecation==2.1.0
+# Flask==2.0.2
+# functions-framework==3.4.0
+# gunicorn==20.1.0
+# itsdangerous==2.0.1
+# Jinja2==3.0.3
+# MarkupSafe==2.0.1
+# packaging==21.3
+# pathtools==0.1.2
+# pyparsing==3.0.6
+# setuptools==60.3.1
+# watchdog==1.0.2
+# Werkzeug==2.0.2
