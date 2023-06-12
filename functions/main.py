@@ -48,7 +48,8 @@ def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
       # set status
       new_value['outputFiles'] = output_files
       new_value['status'] = 'completed'
-    except:
+    except Exception as e:
+      print(e)
       new_value['status'] = 'failed'
 
     # Update the status
@@ -175,6 +176,18 @@ def analyze_image(draft: dict, image: Image) -> list:
         tempList = find_close_objects(forkKnifeTb, furnitures, 0.5)
         if len(tempList) > 0:
           convert_list(tempList, fork_knife_dictionary, furniture_dictionary, 3, output_text_list)
+
+  #senaryo 4 mutfak dışında çatal/bıçak
+  isForkKnifeTb = check_prefixes(boxes, fork_knife_prefixes, isForkKnifeTb)
+  if isForkKnifeTb and draft['location'] != 'kitchen':
+    ### There is a sharp item out in the open!
+    output_text_list.append((f'There is a sharp item out in the open!'))
+
+  #senaryo 5 banyoda elektronik
+  isElectronic = check_prefixes(boxes, electronic_prefixes, isElectronic)
+  if isElectronic and draft['location'] == 'bathroom':
+    ### Electronics in bathroom! Risk of getting wet!
+    output_text_list.append((f'Electronics in the bathroom. Risk of getting wet!'))
 
   return output_text_list
 
