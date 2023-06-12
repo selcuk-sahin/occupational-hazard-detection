@@ -183,7 +183,7 @@ def check_prefixes(box_list, prefixes, isPrefixExist):
     for prefix in prefixes:
       if box.startswith(prefix):
         isPrefixExist = True
-      break
+        break
   return isPrefixExist
 
 #input listesinden prefixler verilerek output listesi oluşacak.
