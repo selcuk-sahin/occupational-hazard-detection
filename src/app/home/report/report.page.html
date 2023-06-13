@@ -130,7 +130,7 @@
     <ng-container *ngIf="report">
       <ng-container *ngFor="let result of report.outputFiles;">
         <div class="ion-margin-bottom ion-padding ion-text-center" *ngIf="report">
-          <img alt="uploaded media" [src]="result.file ?? 'https://ionicframework.com/docs/img/demos/thumbnail.svg'" />
+          <img alt="uploaded media" [src]="result.file | firebaseStorageUrl | async" />
           <p *ngFor="let output of result.outputTexts">{{output}}</p>
           <p *ngIf="result.outputTexts.length <= 0">No problem can be found.</p>
         </div>

@@ -10,6 +10,7 @@ import { ReportPage } from './report.page';
 import { DragAndDropDirectiveModule } from 'src/app/directives/drag-and-drop.directive';
 import { FormatBytesPipeModule } from 'src/app/pipes/format-bytes.pipe';
 import { CamelcaseToTitlecasePipe } from 'src/app/pipes/camelcase-to-titlecase.pipe';
+import { FirebaseStorageUrlPipe } from 'src/app/pipe/firebase-storage-url.pipe';
 
 @NgModule({
   imports: [
@@ -21,6 +22,6 @@ import { CamelcaseToTitlecasePipe } from 'src/app/pipes/camelcase-to-titlecase.p
     FormatBytesPipeModule,
     CamelcaseToTitlecasePipe,
   ],
-  declarations: [ReportPage],
+  declarations: [ReportPage, FirebaseStorageUrlPipe],
 })
 export class ReportPageModule {}
