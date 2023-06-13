@@ -20,8 +20,13 @@ from firebase_functions.options import (
 # Detection
 import math
 from ultralytics import YOLO
-from PIL import Image
+from PIL import (
+  Image,
+  ImageDraw,
+  ImageFont
+)
 from io import BytesIO
+import datetime
 
 app = initialize_app()
 bucket = storage.bucket()
@@ -41,9 +46,12 @@ def on_document_ready(event: Event[Change[DocumentSnapshot]]) -> None:
       # get output files & detection results
       for file in new_value["inputFiles"]:
         image = get_image_from_storage(file)
-        output_texts = analyze_image(new_value, image)
-        ## TODO output file instead of input
-        output_files.append({'outputTexts': output_texts, 'file': file})
+        # output_texts = analyze_image(new_value, image)
+        output_texts, output_image = analyze_image(new_value, image)
+        file_name, extension = file.rsplit('.', 1)  # Split the string at the last dot to get the file name and extension
+        output_image_path = f"{file_name}_out.{extension}"  # Append "_out" before the extension
+        save_file_to_storage(output_image, output_image_path)
+        output_files.append({'outputTexts': output_texts, 'file': output_image_path})
 
       # set status
       new_value['outputFiles'] = output_files
@@ -71,7 +79,16 @@ def get_image_from_storage(image_path):
 
     return image
 
-def analyze_image(draft: dict, image: Image) -> list:
+def save_file_to_storage(image: Image, image_path):
+  blob = bucket.blob(image_path)
+  blob.metadata = {'contentType': 'image/jpeg'}
+  blob.content_type = 'image/jpeg'
+  with blob.open("wb") as f:
+    image_bytes = BytesIO()
+    image.save(image_bytes, format='JPEG')
+    f.write(image_bytes.getvalue())
+
+def analyze_image(draft: dict, image: Image):
   """Load model from GCS"""
   # bucket_name = "occupational-hazard-detection.appspot.com"
   # model_name =  "detection-models/yolov8n.pt"
@@ -105,7 +122,7 @@ def analyze_image(draft: dict, image: Image) -> list:
 
   #Dictionary definitions
   spillable_dictionary = {"39.0": "Bottle", "40.0": "Wine Glass", "41.0": "Cup"}
-  electoric_dictionary = {"62.0": "Laptop", "63.0": "TV"}
+  electoric_dictionary = {"62.0": "TV", "63.0": "Laptop"}
   breakable_dictionary = {"39.0": "Bottle", "40.0": "Wine Glass", "41.0": "Cup", "75.0": "Vase"}
   pet_dictionary = {"15.0": "Cat", "16.0": "Dog"}
   other_dictionary = {"60.0": "Table"}
@@ -128,13 +145,25 @@ def analyze_image(draft: dict, image: Image) -> list:
   names = model.names
 
   #sonuçlar işlenmek üzere hazırlanır
+  draw = ImageDraw.Draw(image)
+  print("draw succ")
   for r in results:
-    for box, class_id, confidence in zip(r.boxes.xywhn, r.boxes.cls, r.boxes.conf):
+    for box, class_id, confidence, box2 in zip(r.boxes.xywhn, r.boxes.cls, r.boxes.conf, r.boxes.xyxy):
       x, y, w, h = box.tolist()
       # Print the processed values
       line_to_add = f"{class_id} {x} {y} {w} {h} {confidence}"
       boxes.append(line_to_add)
       included_names.append(names[int(class_id)])
+      try:
+        #box for drawing
+        x1, y1, x2, y2 = box2.tolist()
+        draw.rectangle([(x1, y1), (x2, y2)], outline='yellow')
+        print("draw rectangle succ")
+        draw.text((x2-20, y1-5), names[int(class_id)], fill='red', font=ImageFont.truetype("arial.ttf", 30))
+        print("draw text succ")
+      except Exception as e:
+        print("failed to draw box")
+        print(e)
 
   #senaryo 1 masa+kedi+kırabilir
   isTable = check_prefixes(boxes, table_prefixes, isTable)
@@ -189,7 +218,7 @@ def analyze_image(draft: dict, image: Image) -> list:
     ### Electronics in bathroom! Risk of getting wet!
     output_text_list.append((f'Electronics in the bathroom. Risk of getting wet!'))
 
-  return output_text_list
+  return output_text_list, image
 
 #kontrol edilecek nesneler var mı kontrolü
 def check_prefixes(box_list, prefixes, isPrefixExist):
